@@ -10,3 +10,4 @@ ownerHotelRoutes.put("/:id", authMiddleware, authorizeRoles("Owner"), updateHote
 ownerHotelRoutes.delete("/:id", authMiddleware, authorizeRoles("Owner"), deleteHotel);
 
 module.exports = ownerHotelRoutes;
+ 

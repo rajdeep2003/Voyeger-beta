@@ -164,7 +164,7 @@ const updateHotelByName = async (req, res) => {
         
         console.log("Backend: Update data received from frontend:", updatedData._id);
 
-        const updatedHotel = await Hotel.findOneAndUpdate(
+        const updatedHotel = await Hotel.findOneAndUpdate( 
             { name: hotelName }, 
             updatedData, 
             { new: true, runValidators: true }

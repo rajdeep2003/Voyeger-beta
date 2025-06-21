@@ -28,15 +28,17 @@ exports.createHotel = async (req, res) => {
       images, // for direct URLs, if provided
       amenities,
       description,
-      duration,
+      duration, 
       people,
       roomTypes,
       bookingstatus,
-      isActive
+      isActive,
+      ownerEmail,
+      ownerPassword
     } = req.body;
 
-    if (!place || !name || !price || !location) {
-      return res.status(400).json({ success: false, message: "Missing required fields: place, name, price, or location." });
+    if (!place || !name || !price || !location || !ownerEmail || !ownerPassword) {
+      return res.status(400).json({ success: false, message: "Missing required fields: place, name, price, location, ownerEmail, or ownerPassword." });
     }
 
     const parsedAmenities = typeof amenities === "string" ? safeJSONParse(amenities, []) : amenities || [];
@@ -82,6 +84,8 @@ exports.createHotel = async (req, res) => {
       geolocation: parsedGeolocation,
       image: mainImage,
       owner: req.user.id,
+      ownerEmail: ownerEmail.toLowerCase().trim(),
+      ownerPassword,
       price,
       rating,
       images: uploadedGallery,

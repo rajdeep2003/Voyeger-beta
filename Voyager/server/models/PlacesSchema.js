@@ -5,7 +5,7 @@ const placeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  location: {
+  location: { 
     type: {
       type: String,
       enum: ['Point'],

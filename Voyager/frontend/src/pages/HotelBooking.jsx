@@ -322,8 +322,8 @@ export default function HotelBooking() {
         room.checkOut = checkOutDate;
         room.bookingId = bookingId;
         room.userId = name;
-        room.email = email;
-        room.name = name;
+        room.email = email; 
+        room.name = roomType;
   
         updatedCount++;
       }
@@ -340,6 +340,14 @@ export default function HotelBooking() {
     });
     const updateData = await updateResponse.json();
     console.log("Response from server after update:", updateData);
+    console.log(hotelname,
+      bookingId,
+      roomType,
+      name,
+      email,
+      checkInDate,
+      checkOutDate,
+      rooms)
   };
   
 

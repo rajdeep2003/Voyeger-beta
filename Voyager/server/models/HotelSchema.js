@@ -3,8 +3,8 @@ const Place = require("../models/PlacesSchema")
 const HotelOwner = require("../models/hoteloner")
 const hotelSchema = new mongoose.Schema({
   place: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Place",
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "Place", 
     required:true,
   },
   name: {
@@ -23,6 +23,16 @@ const hotelSchema = new mongoose.Schema({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "HotelOwner",
+  },
+  ownerEmail: {
+    type: String,
+    required: true,
+    trim: true,
+    lowercase: true
+  },
+  ownerPassword: {
+    type: String,
+    
   },
   price: {
     type: Number,
