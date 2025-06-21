@@ -28,43 +28,74 @@ import TravelDestinationAndaman from "./pages/TravelDestinationAndaman";
 import HiddenGemsBisnapur from "./pages/HiddenGemsBisnapur";
 import HiddenGemsDooars from "./pages/HiddenGemsDooars";
 import Digha from "./pages/Digha";
+import { useAppContext } from "./context/AppContext";
 import HotelApp from "./ownersec/HotelApp";
- 
+import ProtectedRoute from "./components/protectedRoute";
+import VendorApp from "./vendorsec/lib/vendorApp";
+
 const App = () => {
+  const { user } = useAppContext();
+  const isOwner = user && user.role === "Owner";
+  const isVendor = user && user.role === "Vendor";
+
   return (
     <div className="overflow-x-hidden">
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/booking" element={<Booking />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/Community" element={<Community />} />
-        <Route path="/weather" element={<Weather />} />
-        <Route path="/map" element={<MapPage />} />
-        <Route path="/emergency" element={<Emergency />} />
-        <Route path="/explore" element={<ExplorePage />} />
-        <Route path="/flightbook" element={<FlightBooking />} />
-        <Route path="/trainbook" element={<TrainBooking />} />
-        <Route path="/busbook" element={<BusBooking />} />
-        <Route path="/cabbook" element={<CabBooking />} />
-        <Route path="/paris" element={<TravelDestination />} />
-        <Route path="/purulia" element={<TravelDestinationPurulia />} />
-        <Route path="/kerala" element={<TravelDestinationKerala />} />
-        <Route path="/kashmir" element={<TravelDestinationJK />} />
-        <Route path="/delhi" element={<TravelDestinationDelhi />} />
-        <Route path="/andaman" element={<TravelDestinationAndaman />} />
-        <Route path="/bishupur" element={< HiddenGemsBisnapur />} />
-         <Route path="/doars" element={<  HiddenGemsDooars />} />
-        <Route path="/hotelbook" element={<  HotelBooking />} />
-        <Route path="/digha" element={< Digha />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Signup />} />
-        <Route path="/hotelApp" element={<HotelApp />} />
-      </Routes>
-      <Testimonials />
-      <Footer />
+      {isVendor ? (
+        <Routes>
+          <Route
+            path="/vendorApp"
+            element={
+              <ProtectedRoute element={VendorApp} allowedRoles={["Vendor"]} />
+            }
+          />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      ) : isOwner ? (
+        <Routes>
+          <Route
+            path="/hotelApp"
+            element={
+              <ProtectedRoute element={HotelApp} allowedRoles={["Owner"]} />
+            }
+          />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      ) : (
+        <>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/booking" element={<Booking />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/weather" element={<Weather />} />
+            <Route path="/map" element={<MapPage />} />
+            <Route path="/emergency" element={<Emergency />} />
+            <Route path="/explore" element={<ExplorePage />} />
+            <Route path="/flightbook" element={<FlightBooking />} />
+            <Route path="/trainbook" element={<TrainBooking />} />
+            <Route path="/busbook" element={<BusBooking />} />
+            <Route path="/cabbook" element={<CabBooking />} />
+            <Route path="/paris" element={<TravelDestination />} />
+            <Route path="/purulia" element={<TravelDestinationPurulia />} />
+            <Route path="/kerala" element={<TravelDestinationKerala />} />
+            <Route path="/kashmir" element={<TravelDestinationJK />} />
+            <Route path="/delhi" element={<TravelDestinationDelhi />} />
+            <Route path="/andaman" element={<TravelDestinationAndaman />} />
+            <Route path="/bishupur" element={<HiddenGemsBisnapur />} />
+            <Route path="/doars" element={<HiddenGemsDooars />} />
+            <Route path="/hotelbook" element={<HotelBooking />} />
+            <Route path="/digha" element={<Digha />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Signup />} />
+          </Routes>
+          <Testimonials />
+          <Footer />
+        </>
+      )}
     </div>
   );
 };
+
 export default App;

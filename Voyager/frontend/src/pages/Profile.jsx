@@ -4,17 +4,48 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppContext } from "../context/AppContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  FiUser, FiMail, FiPhone, FiStar, FiLogOut, FiCamera, FiX 
+import {
+  FiUser,
+  FiMail,
+  FiPhone,
+  FiStar,
+  FiLogOut,
+  FiCamera,
+  FiX,
 } from "react-icons/fi";
+import { jwtDecode } from "jwt-decode";
 
 const Profile = ({ isOpen, onClose }) => {
-  const token = localStorage.getItem("token") || null;
+  const {
+    user,
+    setUser,
+    setProfileOpen,
+    userDetails,
+    setUserDetails,
+    isLoading,
+    setIsLoading,
+  } = useAppContext();
+  const navigate = useNavigate();
+
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const { user, setUser, setProfileOpen , userDetails,setUserDetails } = useAppContext();
-  const navigate = useNavigate();
+
+  console.log("Profile component rendered");
+
+  const token = user?.token || localStorage.getItem("token");
+  console.log("Token found:", token ? "Yes" : "No");
+
+  useEffect(() => {
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setUserDetails(decoded);
+      } catch (error) {
+        console.error("Failed to decode token:", error);
+        toast.error("Session is invalid. Please log in again.");
+      }
+    }
+  }, [token, setUserDetails]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -28,23 +59,31 @@ const Profile = ({ isOpen, onClose }) => {
 
   const handleImageUpload = async () => {
     if (!image) return;
-    
     try {
       setIsLoading(true);
       const formData = new FormData();
       formData.append("avatar", image);
-      
+      console.log("Uploading image...");
+
       const { data } = await axios.post(
         "http://localhost:5000/api/users/avater",
         formData,
-        {headers : { authorization: "Bearer " + token}},
-        { withCredentials: true, headers: { "Content-Type": "multipart/form-data" } }
+        {
+          headers: {
+            Authorization: "Bearer " + token,
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
       );
-      setUserDetails(data.user)
+
+      console.log("Image uploaded successfully:", data);
+      setUserDetails(data.user);
       toast.success("Profile picture updated!");
       setImage(null);
       setPreview("");
     } catch (error) {
+      console.error("Image upload failed:", error);
       toast.error("Upload failed");
     } finally {
       setIsLoading(false);
@@ -54,30 +93,22 @@ const Profile = ({ isOpen, onClose }) => {
   const handleLogout = async () => {
     try {
       setIsLoading(true);
-      await axios.get("/api/users/logout", { withCredentials: true });
-      localStorage.removeItem("token");
+      await axios.get("http://localhost:5000/api/users/logout", {
+        withCredentials: true,
+      });
+      localStorage.clear();
       setUser(null);
       setProfileOpen(false);
+      console.log("User logged out");
       toast.success("Logged out successfully");
       setTimeout(() => navigate("/login"), 1000);
     } catch (error) {
+      console.error("Logout failed:", error);
       toast.error("Logout failed");
     } finally {
       setIsLoading(false);
     }
   };
-  const getUserDetails = async () => {
-    const { data } = await axios.get(
-      "http://localhost:5000/api/users/profile",
-      { headers: { authorization: "Bearer " + token } }
-    );
-    setUserDetails(data);
-  };
-
-  useEffect(() => {
-      getUserDetails();
-  },[image])
-
 
   return (
     <AnimatePresence>
@@ -92,7 +123,7 @@ const Profile = ({ isOpen, onClose }) => {
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-gray-800">My Profile</h2>
-            <button 
+            <button
               onClick={onClose}
               className="text-gray-500 hover:text-red-500 p-1"
             >
@@ -105,9 +136,17 @@ const Profile = ({ isOpen, onClose }) => {
             <label className="relative cursor-pointer group">
               <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 shadow-sm">
                 {preview ? (
-                  <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
                 ) : userDetails?.avatarUrl ? (
-                  <img src={userDetails.avatarUrl} alt="User" className="w-full h-full object-cover" />
+                  <img
+                    src={userDetails.avatarUrl}
+                    alt="User"
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
                     <FiUser size={32} />
@@ -117,13 +156,14 @@ const Profile = ({ isOpen, onClose }) => {
               <div className="absolute bottom-0 right-0 bg-cyan-500 text-white p-1.5 rounded-full">
                 <FiCamera size={14} />
               </div>
-              <input 
-                type="file" 
-                accept="image/*" 
-                onChange={(e) => handleImageChange(e)} 
-                className="hidden" 
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
               />
             </label>
+
             {image && (
               <div className="flex gap-2 mt-3">
                 <button
@@ -134,7 +174,10 @@ const Profile = ({ isOpen, onClose }) => {
                   {isLoading ? "Uploading..." : "Save"}
                 </button>
                 <button
-                  onClick={() => { setImage(null); setPreview(""); }}
+                  onClick={() => {
+                    setImage(null);
+                    setPreview("");
+                  }}
                   className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
                 >
                   Cancel
@@ -149,19 +192,19 @@ const Profile = ({ isOpen, onClose }) => {
               <h3 className="font-medium text-gray-700 mb-3 flex items-center gap-2">
                 <FiUser className="text-cyan-500" /> Personal Information
               </h3>
-              
+
               <div className="space-y-3 pl-2">
                 <div>
                   <p className="text-xs text-gray-500">Name</p>
-                  <p className="font-medium">{userDetails?.name || "......"}</p>
+                  <p className="font-medium">{userDetails?.name || "..."}</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Email</p>
-                  <p className="font-medium">{userDetails?.email || "......."}</p>
+                  <p className="font-medium">{userDetails?.email || "..."}</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Phone</p>
-                  <p className="font-medium">{userDetails?.phone || "......"}</p>
+                  <p className="font-medium">{userDetails?.phone || "..."}</p>
                 </div>
               </div>
             </div>
@@ -180,10 +223,13 @@ const Profile = ({ isOpen, onClose }) => {
               </div>
             </div>
           </div>
+
           {/* Actions */}
           <div className="space-y-3">
             <button
-              // onClick={() => toast.success("Thanks for your feedback! +10 points")}
+              onClick={() =>
+                toast.success("Thanks for your feedback! +10 points")
+              }
               className="w-full py-2 bg-amber-100 text-amber-700 rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-amber-200"
             >
               <FiStar /> Give Feedback

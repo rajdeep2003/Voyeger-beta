@@ -23,11 +23,17 @@ const searchDestinations = [
   { name: "Paris", path: "/paris" },
   { name: "Kerala", path: "/kerala" },
   { name: "Andaman", path: "/andaman" },
-  {name :"Digha" , Path : "/digha"}
+  { name: "Digha", Path: "/digha" },
 ];
 
 const Navbar = () => {
-  const { profileOpen, setProfileOpen, sidebarOpen, setSidebarOpen, userDetails, setUserDetails } = useAppContext();
+  const {
+    profileOpen,
+    setProfileOpen,
+    sidebarOpen,
+    setSidebarOpen,
+    userDetails,
+  } = useAppContext();
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -37,22 +43,22 @@ const Navbar = () => {
   const [showResults, setShowResults] = useState(false);
 
   const sidebarItems = [
-    t('navbar.sidebarItems.home'),
-    t('navbar.sidebarItems.weather'),
-    t('navbar.sidebarItems.map'),
-    t('navbar.sidebarItems.booking'),
-    t('navbar.sidebarItems.community'),
-    t('navbar.sidebarItems.emergency'),
-    t('navbar.sidebarItems.contact'),
+    t("navbar.sidebarItems.home"),
+    t("navbar.sidebarItems.weather"),
+    t("navbar.sidebarItems.map"),
+    t("navbar.sidebarItems.booking"),
+    t("navbar.sidebarItems.community"),
+    t("navbar.sidebarItems.emergency"),
+    t("navbar.sidebarItems.contact"),
   ];
 
   // Handle search input changes
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-    
+
     if (query.length > 0) {
-      const results = searchDestinations.filter(destination =>
+      const results = searchDestinations.filter((destination) =>
         destination.name.toLowerCase().includes(query.toLowerCase())
       );
       setSearchResults(results);
@@ -76,7 +82,7 @@ const Navbar = () => {
   // Handle clicking on a search result
   const handleResultClick = (path) => {
     navigate(path);
-     window.scrollTo(0, 0);
+    window.scrollTo(0, 0);
     setSearchQuery("");
     setShowResults(false);
   };
@@ -106,19 +112,31 @@ const Navbar = () => {
             <button
               className="relative w-8 h-8 focus:outline-none group"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              aria-label={t('navbar.menuToggle')}
+              aria-label={t("navbar.menuToggle")}
             >
               <span
                 className={`absolute left-0 w-full h-0.5 bg-white rounded-full transition-all duration-300 ease-in-out 
-                ${sidebarOpen ? "top-1/2 transform -translate-y-1/2 rotate-45" : "top-1/4"}`}
+                ${
+                  sidebarOpen
+                    ? "top-1/2 transform -translate-y-1/2 rotate-45"
+                    : "top-1/4"
+                }`}
               ></span>
               <span
                 className={`absolute left-0 w-full h-0.5 bg-white rounded-full transition-all duration-300 ease-in-out 
-                ${sidebarOpen ? "opacity-0" : "top-1/2 transform -translate-y-1/2"}`}
+                ${
+                  sidebarOpen
+                    ? "opacity-0"
+                    : "top-1/2 transform -translate-y-1/2"
+                }`}
               ></span>
               <span
                 className={`absolute left-0 w-full h-0.5 bg-white rounded-full transition-all duration-300 ease-in-out 
-                ${sidebarOpen ? "top-1/2 transform -translate-y-1/2 -rotate-45" : "top-3/4"}`}
+                ${
+                  sidebarOpen
+                    ? "top-1/2 transform -translate-y-1/2 -rotate-45"
+                    : "top-3/4"
+                }`}
               ></span>
             </button>
 
@@ -152,20 +170,31 @@ const Navbar = () => {
          text-sm shadow-sm"
                   onClick={(e) => e.stopPropagation()}
                 />
-                <button 
+                <button
                   type="submit"
                   className="absolute right-3 top-2.5 text-gray-400 hover:text-cyan-400"
-                  aria-label={t('navbar.searchButton')}
+                  aria-label={t("navbar.searchButton")}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
                   </svg>
                 </button>
               </form>
-              
+
               {/* Search results dropdown */}
               {showResults && searchResults.length > 0 && (
-                <div 
+                <div
                   className="absolute top-12 left-0 right-0 bg-gray-800 rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto border border-gray-700"
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -175,9 +204,25 @@ const Navbar = () => {
                       className="px-4 py-3 hover:bg-gray-700 cursor-pointer text-white flex items-center"
                       onClick={() => handleResultClick(result.path)}
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 mr-2 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
                       </svg>
                       <span>{result.name}</span>
                     </div>
@@ -186,14 +231,15 @@ const Navbar = () => {
               )}
             </div>
             {/* Owner's section button (desktop only) */}
-            <Link
-              to="/hotelApp"
-              className="hidden md:inline-block px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold ml-4 hover:from-purple-600 hover:to-pink-600 transition-all shadow-md hover:shadow-pink-500/20"
-              style={{ whiteSpace: 'nowrap' }}
-            >
-              Owner's section
-            </Link>
-            
+            {user?.role === "owner" && (
+              <Link
+                to="/hotelApp"
+                className="hidden md:inline-block px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold ml-4 hover:from-purple-600 hover:to-pink-600 transition-all shadow-md hover:shadow-pink-500/20"
+                style={{ whiteSpace: "nowrap" }}
+              >
+                Owner's section
+              </Link>
+            )}
 
             {/* Auth/Profile */}
             {user == null ? (
@@ -215,11 +261,11 @@ const Navbar = () => {
               <button
                 onClick={() => setProfileOpen(true)}
                 className="w-10 h-10 rounded-full overflow-hidden border-2 border-cyan-400 hover:border-cyan-300 transition-all duration-200 shadow-md hover:shadow-cyan-400/30 relative"
-                aria-label={t('navbar.profileButton')}
+                aria-label={t("navbar.profileButton")}
               >
                 <img
                   src={userDetails?.avatarUrl}
-                  alt={t('navbar.profileImageAlt')}
+                  alt={t("navbar.profileImageAlt")}
                   className="w-full h-full object-cover"
                 />
                 <p className="sm:hidden md:block">{userDetails?.name}</p>
@@ -240,7 +286,7 @@ const Navbar = () => {
           <button
             className="text-gray-300 self-end mb-6 transition-all duration-300 hover:scale-110 hover:text-cyan-400"
             onClick={() => setSidebarOpen(false)}
-            aria-label={t('navbar.closeMenu')}
+            aria-label={t("navbar.closeMenu")}
           >
             <FaTimes size={24} />
           </button>
@@ -259,13 +305,24 @@ const Navbar = () => {
                 onClick={(e) => e.stopPropagation()}
               />
               <div className="absolute left-3 top-2.5 text-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
               </div>
               {/* Mobile search results */}
               {showResults && searchResults.length > 0 && (
-                <div 
+                <div
                   className="absolute top-12 left-0 right-0 bg-gray-800 rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto border border-gray-700"
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -275,9 +332,25 @@ const Navbar = () => {
                       className="px-4 py-3 hover:bg-gray-700 cursor-pointer text-white flex items-center"
                       onClick={() => handleResultClick(result.path)}
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 mr-2 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
                       </svg>
                       <span>{result.name}</span>
                     </div>
@@ -294,7 +367,9 @@ const Navbar = () => {
                 key={index}
                 className="transition-all duration-500 ease-out"
                 style={{
-                  transform: sidebarOpen ? "translateX(0)" : "translateX(-20px)",
+                  transform: sidebarOpen
+                    ? "translateX(0)"
+                    : "translateX(-20px)",
                   opacity: sidebarOpen ? 1 : 0,
                   transitionDelay: `${index * 80}ms`,
                 }}
@@ -303,17 +378,30 @@ const Navbar = () => {
                   to={user == null ? "/login" : `/${item.toLowerCase()}`}
                   className={`flex items-center px-4 py-3 rounded-lg 
                     hover:bg-gray-700/50 hover:text-cyan-400 transition-all duration-300
-                    ${location.pathname === `/${item.toLowerCase()}` ? 
-                      "bg-gray-700/50 text-cyan-400 font-semibold" : 
-                      "text-gray-300"}`}
-                  onClick={() =>  {
+                    ${
+                      location.pathname === `/${item.toLowerCase()}`
+                        ? "bg-gray-700/50 text-cyan-400 font-semibold"
+                        : "text-gray-300"
+                    }`}
+                  onClick={() => {
                     setSidebarOpen(false);
-                    scroll(0,0)
+                    scroll(0, 0);
                   }}
                 >
                   <span className="flex-1 text-left">{item}</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 </Link>
               </li>

@@ -3,90 +3,187 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useAppContext } from "../context/AppContext"; // import context
+import { useAppContext } from "../context/AppContext";
+
 function Login() {
-  const [loginInfo, setLoginInfo] = useState({ email: "", password: "" });
+  const [loginInfo, setLoginInfo] = useState({
+    email: "",
+    password: "",
+    role: "User",
+  });
   const [loading, setLoading] = useState(false);
-  const {user , setUser , howUserLogin, setShowUserLogin} = useAppContext();
+  const { setUser } = useAppContext();
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setLoginInfo({ ...loginInfo, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setLoginInfo((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
+  const validateForm = () => {
+    if (!loginInfo.email || !loginInfo.password) {
+      toast.error("Please enter both email and password.");
+      return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginInfo.email)) {
+      toast.error("Please enter a valid email address.");
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!loginInfo.email || !loginInfo.password) {
-      toast.error("Please enter both email and password.");
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
       setLoading(true);
-      const { data } = await axios.post(
+      const response = await axios.post(
         "http://localhost:5000/api/users/login",
         loginInfo,
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
+          timeout: 5000,
         }
       );
+      const { token, user } = response.data;
 
-      localStorage.setItem("token", data.token);
-      setUser(data.token);  
-       
+      if (!token || !user) {
+        throw new Error("Authentication failed, missing token or user data.");
+      }
+
+      // Save user data
+      localStorage.setItem("authToken", token);
+      localStorage.setItem("userRole", user.role);
+      localStorage.setItem("userEmail", user.email);
+      localStorage.setItem("userName", user.name);
+
+      // Update Context
+      setUser({ token, role: user.role, email: user.email, name: user.name });
       toast.success("Login Successful!");
-      navigate("/home");
+
+      // Role-based navigation
+      if (user.role === "Owner") {
+        navigate("/hotelApp");
+      } else if (user.role === "Vendor") {
+        navigate("/vendorApp");
+      } else {
+        navigate("/"); // Default for regular user
+      }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Invalid Credentials");
+      let errorMessage = "Login failed. Please try again.";
+      if (error.response) {
+        errorMessage =
+          error.response.data?.message ||
+          `Server error (${error.response.status})`;
+        if (error.response.status === 401)
+          errorMessage = "Invalid email or password.";
+        if (error.response.status === 403)
+          errorMessage = "You don't have permission.";
+      } else if (error.code === "ECONNABORTED") {
+        errorMessage = "Request timed out. Please try again.";
+      } else if (error.message.includes("Network Error")) {
+        errorMessage = "Network error. Please check your connection.";
+      }
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-gray-500 to-gray-500 z-10">
-      <div className="bg-gray-300 p-8 rounded-2xl shadow-2xl w-96 relative">
-        <h1 className="text-3xl font-bold text-center mb-4 text-black">Voyager</h1>
-        <h2 className="text-xl font-semibold text-center mb-6">Login</h2>
-        <p className="text-center text-gray-600 text-sm mb-4">
-          Don't have an account yet?{" "}
-          <Link to="/register" className="text-blue-600 font-medium hover:underline">
-            Sign up
-          </Link>
-        </p>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            name="email"
-            value={loginInfo.email}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 bg-transparent text-gray-800 mb-4"
-            placeholder="Email"
-          />
-          <input
-            type="password"
-            name="password"
-            value={loginInfo.password}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 bg-transparent text-gray-800 mb-4"
-            placeholder="Password"
-          />
-          <p className="text-right text-blue-600 text-sm mb-4 cursor-pointer hover:underline">Forgot Password?</p>
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-gray-500 to-gray-900">
+      <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">Voyager</h1>
+          <h2 className="text-xl font-semibold text-gray-600 mt-2">Login</h2>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label
+              htmlFor="role"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Login as:
+            </label>
+            <select
+              name="role"
+              id="role"
+              value={loginInfo.role}
+              onChange={handleChange}
+              className="w-full mt-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={loading}
+            >
+              <option value="User">User</option>
+              <option value="Owner">Owner</option>
+              <option value="Vendor">Vendor</option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Email Address
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={loginInfo.email}
+              onChange={handleChange}
+              required
+              className="w-full mt-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={loading}
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={loginInfo.password}
+              onChange={handleChange}
+              required
+              className="w-full mt-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={loading}
+            />
+          </div>
+
           <button
             type="submit"
-            className={`w-full py-2 rounded-full transition text-white text-lg font-semibold ${loading ? "bg-gray-500" : "bg-black hover:bg-gray-800"}`}
+            className={`w-full flex justify-center py-3 rounded-lg text-lg font-medium text-white ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            }`}
             disabled={loading}
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? "Authenticating..." : "Sign In"}
           </button>
         </form>
-        <ToastContainer />
+
+        <div className="mt-6 text-center">
+          <span className="text-gray-500">Don't have an account? </span>
+          <Link
+            to="/register"
+            className="font-medium text-blue-600 hover:text-blue-500"
+          >
+            Create a new account
+          </Link>
+        </div>
       </div>
+
+      <ToastContainer position="top-center" autoClose={5000} />
     </div>
   );
 }
-export default Login;
 
+export default Login;

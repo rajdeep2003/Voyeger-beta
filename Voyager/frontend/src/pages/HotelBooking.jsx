@@ -5,8 +5,10 @@ import GameSelector from "./GameSelector";
 import { MapPin, Calendar, Users } from "./icons";
 import jsPDF from "jspdf";
 import { jwtDecode } from "jwt-decode";
+import { useAppContext } from "../context/AppContext";
 
 export default function HotelBooking() {
+  const { userDetails } = useAppContext();
   const [hotels, setHotels] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState([200, 400]);
@@ -256,25 +258,6 @@ export default function HotelBooking() {
   }
 
   const handleSimulateYes = () => {
-    let decoded = {};
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        decoded = jwtDecode(token);
-        console.log("Decoded Token:", {
-          name: decoded.name,
-          email: decoded.email,
-          checkin: checkInDate,
-          checkout: checkOutDate,
-          no_of_rooms: rooms,
-        });
-      } catch (e) {
-        console.error("Error decoding token:", e);
-      }
-    } else {
-      console.log("No user token found.");
-    }
-
     setPaymentSuccess(true);
     setShowPaymentSimButtons(false);
     setPaymentError("");
@@ -283,8 +266,8 @@ export default function HotelBooking() {
       selectedHotel.name,
       `bkg-${Date.now()}`,
       roomType,
-      decoded.name,
-      decoded.email,
+      userDetails?.name,
+      userDetails?.email,
       checkInDate,
       checkOutDate,
       rooms
@@ -323,7 +306,7 @@ export default function HotelBooking() {
         room.bookingId = bookingId;
         room.userId = name;
         room.email = email; 
-        room.name = roomType;
+        room.name = name;
   
         updatedCount++;
       }
@@ -358,20 +341,10 @@ export default function HotelBooking() {
   };
 
   const generateReceipt = () => {
-    let userName = "";
-    let userEmail = "";
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        userName = decoded.name || "";
-        userEmail = decoded.email || "";
-      } catch (e) {}
-    }
     const details = {
       bookingId: Date.now(),
-      userName,
-      userEmail,
+      userName: userDetails?.name || "",
+      userEmail: userDetails?.email || "",
       hotelName: selectedHotel?.name,
       hotelLocation: selectedHotel?.location,
       roomType,

@@ -38,7 +38,7 @@ exports.registerUser = async (req, res) => {
     await user.save();
 
     const token = jwt.sign(
-      { userId: user._id, role: user.role , name:user.name , email:user.email},
+      { userId: user._id, role: user.role , name:user.name , email:user.email, phone:user.phone},
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
@@ -101,7 +101,7 @@ exports.loginUser = async (req, res) => {
 
     // Generate token
     const token = jwt.sign(
-      { userId: user._id, role: user.role , name:user.name , email:user.email},
+      { userId: user._id, role: user.role , name:user.name , email:user.email, phone:user.phone},
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
@@ -123,7 +123,7 @@ exports.loginUser = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      phone: user.phone,
+      phone: user.phone, 
       role: user.role,
       points: user.points,
       avatarUrl: user.avatarUrl
